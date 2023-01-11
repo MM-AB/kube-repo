@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: login-deployment
+  labels:
+    app: login
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: login
+  template:
+    metadata:
+      labels:
+        app: login
+    spec:
+      containers:
+        - name: login-container
+          image: rsoreg.azurecr.io/login-service:1.0.2
+          ports:
+            - containerPort: 8082
+          env:
+            - name: MONGO_USERS_URL
+              value: mongodb://shared-mongo-service:27017/users
+      imagePullSecrets:
+        - name: guidesecret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: login-service
+spec:
+  selector:
+    app: login
+  ports:
+    - port: 8082
+      targetPort: 8082
+  type: ClusterIP

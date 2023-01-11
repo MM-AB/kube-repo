@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-deployment
+  labels:
+    app: user
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: user
+  template:
+    metadata:
+      labels:
+        app: user
+    spec:
+      containers:
+        - name: user-container
+          image: rsoreg.azurecr.io/user-service:1.0.2
+          ports:
+            - containerPort: 8084
+          env:
+            - name: MONGO_USERS_URL
+              value: mongodb://shared-mongo-service:27017/users
+      imagePullSecrets:
+        - name: guidesecret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-service
+spec:
+  selector:
+    app: user
+  ports:
+    - port: 8084
+      targetPort: 8084
+  type: ClusterIP

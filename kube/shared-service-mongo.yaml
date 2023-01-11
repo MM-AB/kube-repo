@@ -1,0 +1,53 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: shared-storage
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 256Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: shared-mongo-service
+  labels:
+    app: shared-mongo
+spec:
+  selector:
+    app: shared-mongo
+  ports:
+    - port: 27017
+      targetPort: 27017
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shared-mongo-deployment
+  labels:
+    app: shared-mongo
+spec:
+  selector:
+    matchLabels:
+      app: shared-mongo
+  template:
+    metadata:
+      labels:
+        app: shared-mongo
+    spec:
+      containers:
+        - name: shared-mongo
+          image: rsoreg.azurecr.io/mongo:3.6.17-xenial
+          ports:
+            - containerPort: 27017
+          volumeMounts:
+            - name: shared-storage
+              mountPath: /data/db
+      volumes:
+        - name: shared-storage
+          persistentVolumeClaim:
+            claimName: shared-storage
+      imagePullSecrets:
+        - name: guidesecret
