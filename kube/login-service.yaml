@@ -16,9 +16,9 @@ spec:
     spec:
       containers:
         - name: login-container
-          image: rsoreg.azurecr.io/login-service:1.0.2
+          image: rsoreg.azurecr.io/login-service:2.0.0
           ports:
-            - containerPort: 8082
+            - containerPort: 8080
           env:
             - name: MONGO_USERS_URL
               value: mongodb://shared-mongo-service:27017/users
@@ -33,6 +33,6 @@ spec:
   selector:
     app: login
   ports:
-    - port: 8082
-      targetPort: 8082
+    - port: 8080
+      targetPort: 8080
   type: ClusterIP

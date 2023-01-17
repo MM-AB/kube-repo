@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: order-storage
+  name: order-mongo-pvc
 spec:
   accessModes:
     - ReadWriteOnce
@@ -43,11 +43,11 @@ spec:
           ports:
             - containerPort: 27017
           volumeMounts:
-            - name: order-storage
-              mountPath: /data/db
+            - name: order-mongo-pvc
+              mountPath: /data/db/orders
       volumes:
-        - name: order-storage
+        - name: order-mongo-pvc
           persistentVolumeClaim:
-            claimName: order-storage
+            claimName: order-mongo-pvc
       imagePullSecrets:
         - name: guidesecret

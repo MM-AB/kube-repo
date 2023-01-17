@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: order-container
-          image: rsoreg.azurecr.io/order-service:1.0.2
+          image: rsoreg.azurecr.io/order-service:2.0.1
           ports:
             - containerPort: 8080
           env:

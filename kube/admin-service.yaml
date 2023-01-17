@@ -16,9 +16,9 @@ spec:
     spec:
       containers:
         - name: admin-container
-          image: rsoreg.azurecr.io/admin-service:1.0.2
+          image: rsoreg.azurecr.io/admin-service:2.0.0
           ports:
-            - containerPort: 8081
+            - containerPort: 8080
           env:
             - name: MONGO_USERS_URL
               value: mongodb://shared-mongo-service:27017/users
@@ -33,6 +33,6 @@ spec:
   selector:
     app: admin
   ports:
-    - port: 8081
-      targetPort: 8081
+    - port: 8080
+      targetPort: 8080
   type: ClusterIP
