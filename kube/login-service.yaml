@@ -16,12 +16,24 @@ spec:
     spec:
       containers:
         - name: login-container
-          image: rsoreg.azurecr.io/login-service:2.0.0
+          image: rsoreg.azurecr.io/login-service:2.0.3
           ports:
-            - containerPort: 8080
+            - containerPort: 8081
           env:
             - name: MONGO_USERS_URL
               value: mongodb://shared-mongo-service:27017/users
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 30
+            timeoutSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 30
+            timeoutSeconds: 5
       imagePullSecrets:
         - name: guidesecret
 ---
@@ -33,6 +45,6 @@ spec:
   selector:
     app: login
   ports:
-    - port: 8080
-      targetPort: 8080
+    - port: 8084
+      targetPort: 8084
   type: ClusterIP

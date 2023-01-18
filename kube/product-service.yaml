@@ -16,12 +16,24 @@ spec:
     spec:
       containers:
         - name: product-container
-          image: rsoreg.azurecr.io/product-service:2.0.0
+          image: rsoreg.azurecr.io/product-service:2.0.3
           ports:
-            - containerPort: 8080
+            - containerPort: 8083
           env:
             - name: MONGO_PRODUCTS_URL
               value: mongodb://product-mongo-service:27017/products
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 30
+            timeoutSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 30
+            timeoutSeconds: 5
       imagePullSecrets:
         - name: guidesecret
 ---
@@ -33,6 +45,6 @@ spec:
   selector:
     app: product
   ports:
-    - port: 8080
-      targetPort: 8080
+    - port: 8083
+      targetPort: 8083
   type: ClusterIP
