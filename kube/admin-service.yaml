@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: admin-container
-          image: rsoreg.azurecr.io/admin-service:2.0.3
+          image: rsoreg.azurecr.io/admin-service:2.1.4
           ports:
             - containerPort: 8080
           env:
@@ -34,6 +34,7 @@ spec:
               port: 8080
             initialDelaySeconds: 30
             timeoutSeconds: 5
+
       imagePullSecrets:
         - name: guidesecret
 ---

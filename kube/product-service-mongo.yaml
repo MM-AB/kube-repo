@@ -10,6 +10,18 @@ spec:
       storage: 256Mi
 ---
 apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: product-mongo-pv
+spec:
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 256Mi
+  hostPath:
+    path: /data/db
+---
+apiVersion: v1
 kind: Service
 metadata:
   name: product-mongo-service
@@ -19,7 +31,8 @@ spec:
   selector:
     app: product-mongo
   ports:
-    - port: 27017
+    - protocol: "TCP"
+      port: 27017
       targetPort: 27017
 ---
 apiVersion: apps/v1
@@ -37,17 +50,17 @@ spec:
       labels:
         app: product-mongo
     spec:
-      containers:
-        - name: product-mongo
-          image: rsoreg.azurecr.io/mongo:3.6.17-xenial
-          ports:
-            - containerPort: 27017
-          volumeMounts:
-            - name: product-mongo-pvc
-              mountPath: /data/db/products
       volumes:
         - name: product-mongo-pvc
           persistentVolumeClaim:
             claimName: product-mongo-pvc
+      containers:
+        - name: product-mongo
+          image: rsoreg.azurecr.io/mongo:5.0.14
+          ports:
+            - containerPort: 27017
+          volumeMounts:
+            - name: "product-mongo-pvc"
+              mountPath: "/data/db"
       imagePullSecrets:
         - name: guidesecret

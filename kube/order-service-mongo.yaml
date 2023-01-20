@@ -10,6 +10,18 @@ spec:
       storage: 256Mi
 ---
 apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: order-mongo-pv
+spec:
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 256Mi
+  hostPath:
+    path: /data/db
+---
+apiVersion: v1
 kind: Service
 metadata:
   name: order-mongo-service
@@ -19,7 +31,8 @@ spec:
   selector:
     app: order-mongo
   ports:
-    - port: 27017
+    - protocol: "TCP"
+      port: 27017
       targetPort: 27017
 ---
 apiVersion: apps/v1
@@ -37,17 +50,17 @@ spec:
       labels:
         app: order-mongo
     spec:
-      containers:
-        - name: order-mongo
-          image: rsoreg.azurecr.io/mongo:3.6.17-xenial
-          ports:
-            - containerPort: 27017
-          volumeMounts:
-            - name: order-mongo-pvc
-              mountPath: /data/db/orders
       volumes:
         - name: order-mongo-pvc
           persistentVolumeClaim:
             claimName: order-mongo-pvc
+      containers:
+        - name: order-mongo
+          image: rsoreg.azurecr.io/mongo:5.0.14
+          ports:
+            - containerPort: 27017
+          volumeMounts:
+            - name: "order-mongo-pvc"
+              mountPath: "/data/db"
       imagePullSecrets:
         - name: guidesecret

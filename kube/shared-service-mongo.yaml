@@ -10,6 +10,18 @@ spec:
       storage: 256Mi
 ---
 apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: shared-mongo-pv
+spec:
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 256Mi
+  hostPath:
+    path: /data/db
+---
+apiVersion: v1
 kind: Service
 metadata:
   name: shared-mongo-service
@@ -19,7 +31,8 @@ spec:
   selector:
     app: shared-mongo
   ports:
-    - port: 27017
+    - protocol: "TCP"
+      port: 27017
       targetPort: 27017
 ---
 apiVersion: apps/v1
@@ -37,17 +50,17 @@ spec:
       labels:
         app: shared-mongo
     spec:
-      containers:
-        - name: shared-mongo
-          image: rsoreg.azurecr.io/mongo:3.6.17-xenial
-          ports:
-            - containerPort: 27017
-          volumeMounts:
-            - name: shared-mongo-pvc
-              mountPath: /data/db/shared
       volumes:
         - name: shared-mongo-pvc
           persistentVolumeClaim:
             claimName: shared-mongo-pvc
+      containers:
+        - name: shared-mongo
+          image: rsoreg.azurecr.io/mongo:5.0.14
+          ports:
+            - containerPort: 27017
+          volumeMounts:
+            - name: "shared-mongo-pvc"
+              mountPath: "/data/db"
       imagePullSecrets:
         - name: guidesecret

@@ -24,28 +24,35 @@ spec:
           service:
             name: login-service
             port:
-              number: 8080
+              number: 8084
       - path: /product(/|$)(.*)
         pathType: Prefix
         backend:
           service:
             name: product-service
             port:
-              number: 8080
+              number: 8083
       - path: /order(/|$)(.*)
         pathType: Prefix
         backend:
           service:
             name: order-service
             port:
-              number: 8080
+              number: 8082
+      - path: /health(/|$)(.*)
+        pathType: Prefix
+        backend:
+          service:
+            name: health-service
+            port:
+              number: 8090
       - path: /user(/|$)(.*)
         pathType: Prefix
         backend:
           service:
             name: user-service
             port:
-              number: 8080
+              number: 8081
       - path: /(.*)
         pathType: Prefix
         backend:

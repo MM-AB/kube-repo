@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: product-container
-          image: rsoreg.azurecr.io/product-service:2.0.3
+          image: rsoreg.azurecr.io/product-service:2.0.4
           ports:
             - containerPort: 8083
           env:
@@ -25,15 +25,16 @@ spec:
           livenessProbe:
             httpGet:
               path: /actuator/health
-              port: 8080
+              port: 8083
             initialDelaySeconds: 30
             timeoutSeconds: 5
           readinessProbe:
             httpGet:
               path: /actuator/health
-              port: 8080
+              port: 8083
             initialDelaySeconds: 30
             timeoutSeconds: 5
+
       imagePullSecrets:
         - name: guidesecret
 ---

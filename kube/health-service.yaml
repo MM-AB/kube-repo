@@ -1,50 +1,51 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: user-deployment
+  name: health-deployment
   labels:
-    app: user
+    app: health
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: user
+      app: health
   template:
     metadata:
       labels:
-        app: user
+        app: health
     spec:
       containers:
-        - name: user-container
-          image: rsoreg.azurecr.io/user-service:2.1.0
+        - name: health-container
+          image: rsoreg.azurecr.io/health-service:1.0.1
           ports:
-            - containerPort: 8081
+            - containerPort: 8090
           env:
             - name: MONGO_USERS_URL
-              value: mongodb://shared-mongo-service:27017/users
+              value: mongodb://shared-mongo-service:27017/health
           livenessProbe:
             httpGet:
               path: /actuator/health
-              port: 8081
+              port: 8090
             initialDelaySeconds: 30
             timeoutSeconds: 5
           readinessProbe:
             httpGet:
               path: /actuator/health
-              port: 8081
+              port: 8090
             initialDelaySeconds: 30
             timeoutSeconds: 5
+
       imagePullSecrets:
         - name: guidesecret
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: user-service
+  name: health-service
 spec:
   selector:
-    app: user
+    app: health
   ports:
-    - port: 8081
-      targetPort: 8081
+    - port: 8090
+      targetPort: 8090
   type: ClusterIP

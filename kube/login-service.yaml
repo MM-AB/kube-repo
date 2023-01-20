@@ -18,22 +18,14 @@ spec:
         - name: login-container
           image: rsoreg.azurecr.io/login-service:2.0.3
           ports:
-            - containerPort: 8081
+            - containerPort: 8084
           env:
             - name: MONGO_USERS_URL
               value: mongodb://shared-mongo-service:27017/users
-          livenessProbe:
-            httpGet:
-              path: /actuator/health
-              port: 8080
-            initialDelaySeconds: 30
-            timeoutSeconds: 5
-          readinessProbe:
-            httpGet:
-              path: /actuator/health
-              port: 8080
-            initialDelaySeconds: 30
-            timeoutSeconds: 5
+            - name: CONSUL_HTTP_ADDR
+              value: http://consul-service:8500
+            - name: CONSUL_CONNECT_SERVICE_NAME
+              value: login-service
       imagePullSecrets:
         - name: guidesecret
 ---

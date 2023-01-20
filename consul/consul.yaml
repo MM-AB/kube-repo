@@ -1,0 +1,77 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: consul-config
+data:
+  config.json: |
+    {
+      "service_registration": {
+        "name": "consul",
+        "port": 8500,
+        "address": "consul"
+      },
+      "connect": {
+        "enabled": true,
+        "proxy_defaults": {
+          "protocol": "http",
+          "envoy_prometheus": true
+        }
+      }
+    }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: consul
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: consul
+  template:
+    metadata:
+      labels:
+        app: consul
+    spec:
+      containers:
+        - name: consul
+          image: rsoreg.azurecr.io/consul
+          ports:
+            - containerPort: 8500
+          command:
+            - consul
+            - agent
+            - -server
+            - -ui
+            - -client=0.0.0.0
+            - -bind=0.0.0.0
+            - -bootstrap-expect=1
+            - -data-dir="/consul/data"
+          volumeMounts:
+            - name: config
+              mountPath: /consul/config
+            - name: data
+              mountPath: /consul/data
+      volumes:
+        - name: config
+          configMap:
+            name: consul-config
+        - name: data
+          emptyDir: {}
+      imagePullSecrets:
+        - name: guidesecret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: consul-service
+  labels:
+    app: consul
+spec:
+  selector:
+    app: consul
+  ports:
+    - name: http
+      port: 8500
+      targetPort: 8500
+  type: LoadBalancer
